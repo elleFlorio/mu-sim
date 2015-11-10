@@ -107,7 +107,7 @@ func readMessage(w http.ResponseWriter, r *http.Request) {
 	worker.Work(workload)
 	log.Printf("Request %s computed", requestID)
 	execTimeMs := time.Since(start).Seconds() * 1000
-	log.Println("gru:" + name + ":" + "execution_time:" + strconv.FormatFloat(execTimeMs, 'f', 2, 64) + ":ms")
+	log.Printf("Execution time: %fms\n", execTimeMs)
 
 	if len(destinations) > 0 {
 		errCounter := sendMessageToDestinations(requestID)
@@ -211,8 +211,8 @@ func readResponse(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(422)
 		return
 	}
+	log.Printf("Response time: %fms\n", respTimeMs)
 
-	log.Println("gru:" + name + ":" + "response_time" + ":" + strconv.FormatFloat(respTimeMs, 'f', 2, 64) + ":ms")
 	w.WriteHeader(http.StatusCreated)
 }
 
