@@ -3,10 +3,10 @@ package network
 import (
 	"bytes"
 	"encoding/json"
-	"log"
-	//"fmt"
+	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -15,6 +15,8 @@ type Message struct {
 	Body   string `json:"body"`
 	Args   string `json:"args"`
 }
+
+var ErrNoSuchParam = errors.New("Parameter not found")
 
 func doRequest(method string, path string, body []byte) {
 	b := bytes.NewBuffer(body)
@@ -70,4 +72,12 @@ func ReadMessage(r *http.Request) (Message, error) {
 	}
 
 	return message, nil
+}
+
+func ReadParam(name string, r *http.Request) (string, error) {
+	if param, ok := r.URL.Query()[name]; ok {
+		return param[0], nil
+	}
+	log.Println(ErrNoSuchParam)
+	return "", ErrNoSuchParam
 }

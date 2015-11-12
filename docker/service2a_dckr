@@ -1,0 +1,22 @@
+############################################################
+# Dockerfile to build testApp service2a container images
+# Based on Ubuntu
+############################################################
+
+# Set the base image to Ubuntu
+FROM ubuntu
+
+# File Author / Maintainer
+MAINTAINER Luca Florio
+
+################## BEGIN INSTALLATION ######################
+# Usage: ADD [source directory or URL] [destination directory]
+ADD testApp /usr/bin/testApp
+
+##################### INSTALLATION END #####################
+
+# Set default container command
+ENTRYPOINT ["testApp"]
+
+# Set the params to the entrypoint
+CMD ["start", "service2a", "-e", "http://172.17.0.1:4001", "-p", "50200", "-w", "medium", "-d", "service3a"]

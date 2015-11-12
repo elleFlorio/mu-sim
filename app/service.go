@@ -104,32 +104,61 @@ func readMessage(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("Received request %s from %s\n", requestID, message.Sender)
 
+	service, err := network.ReadParam("service", r)
+	if err != nil {
+		log.Println("Cannot read param 'service'")
+	}
+
 	worker.Work(workload)
 	log.Printf("Request %s computed", requestID)
 	execTimeMs := time.Since(start).Seconds() * 1000
-	log.Printf("Execution time: %fms\n", execTimeMs)
+	log.Println("gru:" + name + ":" + "execution_time:" + strconv.FormatFloat(execTimeMs, 'f', 2, 64) + ":ms")
 
-	if len(destinations) > 0 {
-		errCounter := sendMessageToDestinations(requestID)
-		if errCounter < len(destinations) {
-			// This is for requests to multiple destinations
-			// because I have to wait till every destination
-			// responde me before consider the request complete
-			reqCounter := len(destinations) - errCounter
-			req := Request{requestID, message.Sender, reqCounter, start}
-			addRequestToHistory(req)
-		}
-
-		if errCounter > 0 {
-			log.Println("Cannot dispatch message to all the destinations")
+	if service != "" {
+		err = sendMessageToSpecificService(requestID, service)
+		if err != nil {
+			log.Println("Cannot dispatch message to service", service)
 			w.WriteHeader(422)
 			return
 		}
+		req := Request{requestID, message.Sender, 1, start}
+		addRequestToHistory(req)
 	} else {
-		respondeToRequest(message.Sender, requestID)
+		if len(destinations) > 0 {
+			errCounter := sendMessageToDestinations(requestID)
+			if errCounter < len(destinations) {
+				// This is for requests to multiple destinations
+				// because I have to wait till every destination
+				// responde me before consider the request complete
+				reqCounter := len(destinations) - errCounter
+				req := Request{requestID, message.Sender, reqCounter, start}
+				addRequestToHistory(req)
+			}
+			if errCounter > 0 {
+				log.Println("Cannot dispatch message to all the destinations")
+				w.WriteHeader(422)
+				if errCounter == len(destinations) {
+					respondeToRequest(message.Sender, requestID)
+				}
+				return
+			}
+		} else {
+			respondeToRequest(message.Sender, requestID)
+		}
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func sendMessageToSpecificService(requestID string, service string) error {
+	instances, err := discovery.GetAvailableInstances(service)
+	if err != nil {
+		log.Println("Cannot dispatch message to service ", service)
+		return err
+	}
+	destination := getDestination(instances)
+	sendReqToDest(requestID, destination)
+	return nil
 }
 
 func sendMessageToDestinations(requestID string) int {
@@ -211,7 +240,7 @@ func readResponse(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(422)
 		return
 	}
-	log.Printf("Response time: %fms\n", respTimeMs)
+	log.Println("gru:" + name + ":" + "response_time" + ":" + strconv.FormatFloat(respTimeMs, 'f', 2, 64) + ":ms")
 
 	w.WriteHeader(http.StatusCreated)
 }
