@@ -104,7 +104,7 @@ func jobsManager(ch_req chan network.Request) {
 			go worker.Work(workload, req, ch_done)
 		case reqDone := <-ch_done:
 			log.Printf("Request %s computed", reqDone.ID)
-			log.Println("gru:" + name + ":" + "execution_time:" + strconv.FormatFloat(reqDone.ExecTimeMs, 'f', 2, 64) + ":ms")
+			log.Println("service " + name + " " + "execution_time:" + strconv.FormatFloat(reqDone.ExecTimeMs, 'f', 2, 64) + "ms")
 			finalizeReq(reqDone)
 			removeReqFromWorks(reqDone.ID)
 		}
@@ -355,7 +355,7 @@ func readResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if message.Body == "done" {
-		log.Println("gru:" + name + ":" + "response_time" + ":" + strconv.FormatFloat(respTimeMs, 'f', 2, 64) + ":ms")
+		log.Println("service " + name + " " + "response_time" + ":" + strconv.FormatFloat(respTimeMs, 'f', 2, 64) + "ms")
 	} else {
 		log.Println("Error: request lost.")
 	}
