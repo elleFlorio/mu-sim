@@ -44,7 +44,6 @@ func InitializeEtcd(uri string) error {
 	return nil
 }
 
-//FIXME
 func RegisterToEtcd(name string, address string) error {
 	var err error
 
@@ -71,7 +70,15 @@ func RegisterToEtcd(name string, address string) error {
 	return nil
 }
 
-func KeepAlive() {
+func UnregisterFromEtcd() {
+	_, err := kAPI.Delete(context.Background(), myKey, nil)
+	if err != nil {
+		log.Println(err.Error())
+		log.Println("Cannot unregister from etcd")
+	}
+}
+
+func KeepAlive(ch_stop chan struct{}) {
 	var err error
 	ticker := time.NewTicker(time.Duration(5) * time.Second)
 
@@ -88,6 +95,8 @@ func KeepAlive() {
 				log.Println(err)
 				log.Println("Cannot keep the agent Alive")
 			}
+		case <-ch_stop:
+			return
 		}
 	}
 }
