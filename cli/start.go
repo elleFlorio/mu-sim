@@ -2,6 +2,7 @@ package cli
 
 import (
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/elleFlorio/testApp/Godeps/_workspace/src/github.com/codegangsta/cli"
@@ -17,6 +18,11 @@ func start(c *cli.Context) {
 
 	name := c.Args().First()
 	etcdAddress := c.String("etcdserver")
+
+	influxAddress := c.String("influxdb")
+	influxDB := c.String("db-name")
+	influxUser := os.Getenv("INFLUX_USER")
+	influxPwd := os.Getenv("INFLUX_PWD")
 
 	var ip string
 	if ip = c.String("ipaddress"); ip == "" {
@@ -35,6 +41,10 @@ func start(c *cli.Context) {
 
 	params := app.ServiceParams{
 		etcdAddress,
+		influxAddress,
+		influxDB,
+		influxUser,
+		influxPwd,
 		ip,
 		port,
 		name,

@@ -14,17 +14,22 @@ import (
 	"time"
 
 	"github.com/elleFlorio/testApp/discovery"
+	"github.com/elleFlorio/testApp/metric"
 	"github.com/elleFlorio/testApp/network"
 	"github.com/elleFlorio/testApp/worker"
 )
 
 type ServiceParams struct {
-	EtcdAddress  string
-	Ip           string
-	Port         string
-	Name         string
-	Workload     string
-	Destinations []string
+	EtcdAddress   string
+	InfluxAddress string
+	InfluxDbName  string
+	InfluxUser    string
+	InfluxPwd     string
+	Ip            string
+	Port          string
+	Name          string
+	Workload      string
+	Destinations  []string
 }
 
 const (
@@ -77,6 +82,7 @@ func StartService(params ServiceParams) {
 	startSigsMonitor(ch_stop)
 	keepAlive(ch_stop)
 	startJobsManager(ch_req)
+	initializeMetricService(params)
 
 	http.HandleFunc(responsePath, readResponse)
 	http.HandleFunc(messagePath, readMessage)
@@ -107,6 +113,7 @@ func jobsManager(ch_req chan network.Request) {
 			log.Println("service " + name + " " + "execution_time:" + strconv.FormatFloat(reqDone.ExecTimeMs, 'f', 2, 64) + "ms")
 			finalizeReq(reqDone)
 			removeReqFromWorks(reqDone.ID)
+			metric.SendExecutionTime(reqDone.ExecTimeMs)
 		}
 	}
 }
@@ -124,6 +131,19 @@ func sigsMonitor(ch_stop chan struct{}) {
 		case <-sigs:
 			go shutDown(ch_stop)
 		}
+	}
+}
+
+func initializeMetricService(params ServiceParams) {
+	config := metric.InfluxConfig{
+		params.InfluxAddress,
+		params.InfluxDbName,
+		params.InfluxUser,
+		params.InfluxPwd,
+	}
+	err := metric.Initialize(params.Name, params.Workload, params.Ip, config)
+	if err != nil {
+		log.Fatalf("Error: %s; failded to initialize metric service", err.Error())
 	}
 }
 
@@ -356,6 +376,7 @@ func readResponse(w http.ResponseWriter, r *http.Request) {
 	}
 	if message.Body == "done" {
 		log.Println("service " + name + " " + "response_time" + ":" + strconv.FormatFloat(respTimeMs, 'f', 2, 64) + "ms")
+		metric.SendResponseTime(respTimeMs)
 	} else {
 		log.Println("Error: request lost.")
 	}

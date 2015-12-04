@@ -24,6 +24,16 @@ func Run() {
 					Usage: fmt.Sprintf("url of etcd server. Default is 'http://localhost:4001'"),
 				},
 				cli.StringFlag{
+					Name:  "influxdb, m",
+					Value: "http://localhost:8086",
+					Usage: fmt.Sprintf("url of influxdb. Default is 'http://localhost:8086'"),
+				},
+				cli.StringFlag{
+					Name:  "db-name, db",
+					Value: "testAppDB",
+					Usage: fmt.Sprintf("influxdb database name. Default is 'testAppDB'"),
+				},
+				cli.StringFlag{
 					Name:  "ipaddress, a",
 					Value: "",
 					Usage: fmt.Sprintf("Ip address of the host"),
@@ -36,7 +46,7 @@ func Run() {
 				cli.StringFlag{
 					Name:  "workload, w",
 					Value: "medium",
-					Usage: fmt.Sprintf("workload (options: none, low, medium, heavy)"),
+					Usage: fmt.Sprintf("workload (options: none, low, medium, heavy). Default is 'medium'"),
 				},
 				cli.StringSliceFlag{
 					Name:  "destinations, d",
