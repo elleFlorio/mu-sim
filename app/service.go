@@ -134,19 +134,6 @@ func sigsMonitor(ch_stop chan struct{}) {
 	}
 }
 
-func initializeMetricService(params ServiceParams) {
-	config := metric.InfluxConfig{
-		params.InfluxAddress,
-		params.InfluxDbName,
-		params.InfluxUser,
-		params.InfluxPwd,
-	}
-	err := metric.Initialize(params.Name, params.Workload, params.Ip, config)
-	if err != nil {
-		log.Fatalf("Error: %s; failded to initialize metric service", err.Error())
-	}
-}
-
 func shutDown(ch_stop chan struct{}) {
 	log.Println("Received shutdown signal")
 	ch_stop <- struct{}{}
@@ -186,6 +173,19 @@ func isServiceWaiting() bool {
 	}
 
 	return false
+}
+
+func initializeMetricService(params ServiceParams) {
+	config := metric.InfluxConfig{
+		params.InfluxAddress,
+		params.InfluxDbName,
+		params.InfluxUser,
+		params.InfluxPwd,
+	}
+	err := metric.Initialize(params.Name, params.Workload, params.Ip, config)
+	if err != nil {
+		log.Fatalf("Error: %s; failded to initialize metric service", err.Error())
+	}
 }
 
 func addReqToWorks(req network.Request) {

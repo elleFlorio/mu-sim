@@ -3,7 +3,7 @@ package metric
 import (
 	"time"
 
-	"github.com/influxdb/influxdb/client/v2"
+	"github.com/elleFlorio/testApp/Godeps/_workspace/src/github.com/influxdb/influxdb/client/v2"
 )
 
 type InfluxConfig struct {
