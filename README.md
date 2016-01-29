@@ -82,7 +82,7 @@ MuSim is not fault tolerant by now and requests may be lost due to failure of Mu
 
 ![MuSim graph](https://github.com/elleFlorio/mu-sim/blob/master/mu-sim_graph.png)
 
-The endpoint does not work, it simply act as the entrypoint of the application and balance the load among the destinations. Destinations are not specified, because I may wont to send a request to service1a or service1b, so the destination will be specified inside the requests. Service1a and service1b do a medium workload; service2a, service2b and service2c do a heavy workload; the database does a low workload.
+The endpoint does not execute any work, it simply acts as the entrypoint of the application and balance the load among the destinations. Destinations are not specified, because want to send a request to service1a or service1b but not both of them, so the destination will be specified inside the requests. Service1a and service1b execute a medium workload; service2a, service2b and service2c execute a heavy workload; the database execute a low workload.
 
 Let's create all the MuSims:
   - `endpoint: mu-sim start endpoint -w none -p 8080`
