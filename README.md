@@ -66,33 +66,33 @@ This procedure is not 100% robust, and may lead to a deadlock if there is a fail
 MuSim is not fault tolerant by now and requests may be lost due to failure of MuSim instances. Maybe someday I will implement a mechanism to handle failures, but now it is up to you.
 
 ### Examples ###
-1. Start a single service named "pippo" using Env Vars with default parameters and no destinations:
+* Start a single service named "pippo" using Env Vars with default parameters and no destinations:
 
 `mu-sim start pippo`
 
-2. Start a single service named "pippo" using Env Vars with workload "low" and destinations topolino and paperino:
+* Start a single service named "pippo" using Env Vars with workload "low" and destinations topolino and paperino:
 
 `mu-sim start pippo -w low -d topolino -d paperino`
 
-3. Start a single service named "pippo" using Env Vars using the docker image and specifying ip and port
+* Start a single service named "pippo" using Env Vars using the docker image and specifying ip and port
 
 `docker run -e ETCD_ADDR -e HostIP -e INFLUX_USER -e INFLUX_PWD -e INFLUX_ADDR -p 50100:50100 --name pippo elleflorio/musim start pippo -p 50100`
 
-4. Create the following graph of MuSims
+* Create the following graph of MuSims
 
 ![MuSim graph](https://github.com/elleFlorio/mu-sim/blob/master/mu-sim_graph.png)
 
 The endpoint does not work, it simply act as the entrypoint of the application and balance the load among the destinations. Destinations are not specified, because I may wont to send a request to service1a or service1b, so the destination will be specified inside the requests. Service1a and service1b do a medium workload; service2a, service2b and service2c do a heavy workload; the database does a low workload.
 
 Let's create all the MuSims:
-- `endpoint: mu-sim start endpoint -w none -p 8080`
-- `service1a: mu-sim start service1a -d service2a -d service2b`
-- `service1b: mu-sim start service1b -d service2b -d service2c`
-- `service2a: mu-sim start service2a -w heavy -d database`
-- `service2b: mu-sim start service2b -w heavy -d database`
-- `service2c: mu-sim start service2c -w heavy -d database`
-- `database: mu-sim start database -w low`
-- 
+  - `endpoint: mu-sim start endpoint -w none -p 8080`
+  - `service1a: mu-sim start service1a -d service2a -d service2b`
+  - `service1b: mu-sim start service1b -d service2b -d service2c`
+  - `service2a: mu-sim start service2a -w heavy -d database`
+  - `service2b: mu-sim start service2b -w heavy -d database`
+  - `service2c: mu-sim start service2c -w heavy -d database`
+  - `database: mu-sim start database -w low`
+
 Now you can send the requests to the endpoint both to service1a:
 
 `curl -H "Content-Type: application/json" -X POST -d '{"sender":"","body":"do", "args":""}' http://localhost:8080/message?service=service1a`
