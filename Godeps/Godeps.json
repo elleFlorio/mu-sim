@@ -1,6 +1,6 @@
 {
-	"ImportPath": "github.com/elleFlorio/testApp",
-	"GoVersion": "go1.5.1",
+	"ImportPath": "github.com/elleFlorio/mu-sim",
+	"GoVersion": "go1.5",
 	"Packages": [
 		"./..."
 	],

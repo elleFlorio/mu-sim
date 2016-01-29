@@ -13,10 +13,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elleFlorio/testApp/discovery"
-	"github.com/elleFlorio/testApp/metric"
-	"github.com/elleFlorio/testApp/network"
-	"github.com/elleFlorio/testApp/worker"
+	"github.com/elleFlorio/mu-sim/discovery"
+	"github.com/elleFlorio/mu-sim/metric"
+	"github.com/elleFlorio/mu-sim/network"
+	"github.com/elleFlorio/mu-sim/worker"
 )
 
 type ServiceParams struct {
@@ -41,6 +41,7 @@ var (
 	name         string
 	destinations []string
 	workload     string
+	useMetrics   bool
 	requests     map[string]network.Request
 	jobs         map[string]network.Request
 	counter      = 1
@@ -65,6 +66,12 @@ func StartService(params ServiceParams) {
 	name = params.Name
 	destinations = params.Destinations
 	workload = params.Workload
+
+	log.Println("Service: ", name)
+	log.Println("Address: ", params.Ip)
+	log.Println("Port: ", params.Port)
+	log.Println("Workload: ", workload)
+	log.Println("Destinations: ", destinations)
 
 	err = discovery.InitializeEtcd(params.EtcdAddress)
 	if err != nil {
@@ -113,7 +120,9 @@ func jobsManager(ch_req chan network.Request) {
 			log.Println("service " + name + " " + "execution_time:" + strconv.FormatFloat(reqDone.ExecTimeMs, 'f', 2, 64) + "ms")
 			finalizeReq(reqDone)
 			removeReqFromWorks(reqDone.ID)
-			metric.SendExecutionTime(reqDone.ExecTimeMs)
+			if useMetrics {
+				metric.SendExecutionTime(reqDone.ExecTimeMs)
+			}
 		}
 	}
 }
@@ -176,15 +185,16 @@ func isServiceWaiting() bool {
 }
 
 func initializeMetricService(params ServiceParams) {
+	var err error
 	config := metric.InfluxConfig{
 		params.InfluxAddress,
 		params.InfluxDbName,
 		params.InfluxUser,
 		params.InfluxPwd,
 	}
-	err := metric.Initialize(params.Name, params.Workload, params.Ip, config)
+	useMetrics, err = metric.Initialize(params.Name, params.Workload, params.Ip, config)
 	if err != nil {
-		log.Fatalf("Error: %s; failded to initialize metric service", err.Error())
+		log.Printf("Error: %s; failded to initialize metric service. Metrics won't be recorded", err.Error())
 	}
 }
 
@@ -376,7 +386,9 @@ func readResponse(w http.ResponseWriter, r *http.Request) {
 	}
 	if message.Body == "done" {
 		log.Println("service " + name + " " + "response_time" + ":" + strconv.FormatFloat(respTimeMs, 'f', 2, 64) + "ms")
-		metric.SendResponseTime(respTimeMs)
+		if useMetrics {
+			metric.SendResponseTime(respTimeMs)
+		}
 	} else {
 		log.Println("Error: request lost.")
 	}

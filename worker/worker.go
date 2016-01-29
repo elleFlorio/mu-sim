@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/elleFlorio/testApp/network"
+	"github.com/elleFlorio/mu-sim/network"
 )
 
 const (

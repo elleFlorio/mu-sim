@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/elleFlorio/testApp/Godeps/_workspace/src/github.com/coreos/etcd/client"
-	"github.com/elleFlorio/testApp/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/elleFlorio/mu-sim/Godeps/_workspace/src/github.com/coreos/etcd/client"
+	"github.com/elleFlorio/mu-sim/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
 var (
@@ -53,7 +53,7 @@ func RegisterToEtcd(name string, address string) error {
 		return err
 	}
 
-	myKey = "testApp/" + name + "/" + uuid
+	myKey = "mu-sim/" + name + "/" + uuid
 	myAddress = address
 
 	_, err = kAPI.Set(
@@ -102,7 +102,7 @@ func KeepAlive(ch_stop chan struct{}) {
 }
 
 func GetAvailableInstances(service string) ([]string, error) {
-	key := "testApp/" + service + "/"
+	key := "mu-sim/" + service + "/"
 	available := []string{}
 	resp, err := kAPI.Get(context.Background(), key, nil)
 	if err != nil {

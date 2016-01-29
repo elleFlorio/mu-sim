@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elleFlorio/testApp/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/elleFlorio/mu-sim/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
 // Do sends an HTTP request with the provided http.Client and returns an HTTP response.

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/elleFlorio/testApp/cli"
+	"github.com/elleFlorio/mu-sim/cli"
 )
 
 func main() {

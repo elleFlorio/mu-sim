@@ -1,9 +1,10 @@
 package metric
 
 import (
+	"errors"
 	"time"
 
-	"github.com/elleFlorio/testApp/Godeps/_workspace/src/github.com/influxdb/influxdb/client/v2"
+	"github.com/elleFlorio/mu-sim/Godeps/_workspace/src/github.com/influxdb/influxdb/client/v2"
 )
 
 type InfluxConfig struct {
@@ -22,7 +23,11 @@ var (
 	batch          client.BatchPoints
 )
 
-func Initialize(serviceName string, serviceWorkload string, serviceAddress string, influxConf InfluxConfig) error {
+func Initialize(serviceName string, serviceWorkload string, serviceAddress string, influxConf InfluxConfig) (bool, error) {
+	if influxConf.Address == "" {
+		return false, errors.New("Metric service not configured")
+	}
+
 	var err error
 	tags = map[string]string{
 		"name":     serviceName,
@@ -43,7 +48,7 @@ func Initialize(serviceName string, serviceWorkload string, serviceAddress strin
 		Password: config.Password,
 	})
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	batch, err = client.NewBatchPoints(client.BatchPointsConfig{
@@ -51,10 +56,10 @@ func Initialize(serviceName string, serviceWorkload string, serviceAddress strin
 		Precision: "ms",
 	})
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return nil
+	return true, nil
 }
 
 func SendExecutionTime(execTime float64) error {

@@ -2,13 +2,12 @@ package cli
 
 import (
 	"log"
-	"os"
 	"strconv"
 
-	"github.com/elleFlorio/testApp/Godeps/_workspace/src/github.com/codegangsta/cli"
+	"github.com/elleFlorio/mu-sim/Godeps/_workspace/src/github.com/codegangsta/cli"
 
-	"github.com/elleFlorio/testApp/app"
-	"github.com/elleFlorio/testApp/network"
+	"github.com/elleFlorio/mu-sim/app"
+	"github.com/elleFlorio/mu-sim/network"
 )
 
 func start(c *cli.Context) {
@@ -21,8 +20,8 @@ func start(c *cli.Context) {
 
 	influxAddress := c.String("influxdb")
 	influxDB := c.String("db-name")
-	influxUser := os.Getenv("INFLUX_USER")
-	influxPwd := os.Getenv("INFLUX_PWD")
+	influxUser := c.String("db-user")
+	influxPwd := c.String("db-pwd")
 
 	var ip string
 	if ip = c.String("ipaddress"); ip == "" {
@@ -37,7 +36,7 @@ func start(c *cli.Context) {
 	port = ":" + port
 
 	workload := c.String("workload")
-	destinations := c.StringSlice("destinations")
+	destinations := c.StringSlice("destination")
 
 	params := app.ServiceParams{
 		etcdAddress,
