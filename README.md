@@ -31,7 +31,7 @@ This is the list of required flags. the first column is the flag name with its a
 | Flag | EnvVar | Description | Required |
 | --- | --- | --- | --- |
 | etcdserver, e | ETCD_ADDR | URL of etcd server | True |
-| ipaddress, a | HostIP | address of the host | True if you run MuSim inside the Docker image, otherwise MuSim will automagically get the ip address |
+| ipaddress, a | HostIP | address of the host | True if you run MuSim inside the Docker container, otherwise MuSim will automagically get the ip address |
 | port, p | / | port of the service | True, but if not provided MuSim will automagically find a free port in the host |
 | workload, w | / | Workload of the service. The value can be "none" (lambda=0s), "low" (lambda=1s), "medium" (lambda=5s), "heavy" (lambda=10s) | False (default: "medium") |
 | destination, d | / | Destination where to send the request once it has been completed. It can be used several times to set multiple destinations. The MuSim service waits for ALL its destinations to respond before sending a response to the received request | False |
