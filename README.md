@@ -50,8 +50,8 @@ You can also specify a destination directly inside the request. Suppose you want
 `curl -H "Content-Type: application/json" -X POST -d '{"sender":"","body":"do", "args":""}' http://localhost:8080/message?service=topolino`
 
 ##### Load balancing #####
-MuSim automatically load balance the requests to its destinations selecting randomly a target in the set of the instance of the destination. Let's clarify this with an example:
-suppose the MuSim pippo has the MuSim topolino as destination, and MuSim topolino has 3 active instances (i.e. there are 3 MuSim started with name "topolino"). The MuSim pippo ask to the etcd server the active instances of MuSim topolino, then chose randomly (uniform distribution) one of the instances as the destination of the request.
+MuSim automatically load balance the requests to its destinations selecting randomly a target in the set of the instances of the destination. Let's clarify this with an example:
+suppose the MuSim pippo has the MuSim topolino as destination, and MuSim topolino has 3 active instances (i.e. there are 3 MuSim started with name "topolino"). The MuSim pippo asks to the etcd server the active instances of MuSim topolino, then chose randomly (uniform distribution) one of the instances as the destination of the request.
 
 ##### Scaling #####
 MuSim register itself to the etcd server when it starts and then run a "keepAlive" function to notify etcd that it is still there up and running. This means that you can start and stop MuSim instances without worries. When a MuSim is stopped it follows this shut down steps:
@@ -60,7 +60,7 @@ MuSim register itself to the etcd server when it starts and then run a "keepAliv
 - wait for the response of the destinations
 - respond to the requests
 - shut down
-This procedure is not 100% robust, and may lead to a deadlock if there is a failure in one of the destination that is computing a response. However, is enough to ensure the scaling (also automatic) of the application.
+This procedure is not 100% robust, and may lead to a deadlock if there is a failure in one of the destination that is computing a response. However, it is enough to ensure the scaling (also automatic) of the application.
 
 ##### Fault tolerance #####
 MuSim is not fault tolerant by now and requests may be lost due to failure of MuSim instances. Maybe someday I will implement a mechanism to handle failures, but now it is up to you.
@@ -100,5 +100,8 @@ Now you can send the requests to the endpoint both to service1a:
 or to service1b:
 
 `curl -H "Content-Type: application/json" -X POST -d '{"sender":"","body":"do", "args":""}' http://localhost:8080/message?service=service1b`
+
+## That's all ##
+Feel free to contribute or send me feedbacks/comments/requests
 
 That's all, enjoy! :-)
